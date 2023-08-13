@@ -3,15 +3,19 @@ $(document).ready(function () {
     $("#registerForm").submit(function (event) {
         event.preventDefault();
         $.ajax({
-            url: "/Account/Register",
+            url: "/Staff/Login",
             type: "POST",
             data: $(this).serialize(),
-            
             success: function (result) {
-                if (result.isSuccess) {
+                console.log("xin chào");
+                if (result.isSuccess===false) {
                     $("#successMessage").show();
                 }
+                else {
+                    window.location.href = "/Staff/Login";
+                }
             }
+            
         });
     });
 });

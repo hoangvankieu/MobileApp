@@ -160,3 +160,31 @@ CREATE TABLE dbo.import_bill_detail
 	PRIMARY KEY(mobile_id,color_id,imp_id)
 
 )
+go
+-- Procedure
+--register
+DROP PROCEDURE  [dbo].[RegisterStaff]
+GO
+CREATE PROCEDURE [dbo].[RegisterStaff]
+	@username VARCHAR(100),
+	@hash_password VARCHAR(MAX),
+	@role VARCHAR(20)
+AS
+BEGIN
+	INSERT INTO dbo.staff(username,hash_password,[role]) VALUES(@username,HASHBYTES('SHA2_256',@hash_password),@role);
+	SELECT * FROM dbo.staff WHERE staff_id = SCOPE_IDENTITY()
+END
+
+GO
+--login
+CREATE PROCEDURE [dbo].[Login]
+@username VARCHAR(100),
+@password VARCHAR(MAX)
+AS
+BEGIN
+	SELECT * FROM dbo.staff WHERE username=@username AND hash_password=HASHBYTES('SHA2_256',@password);
+END
+go
+
+EXEC dbo.[login] 'kieu', '123456'
+GO

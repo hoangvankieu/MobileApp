@@ -1,4 +1,4 @@
 ﻿/*------------ERROR-validate*/
-label.error {
+p.error , label.error {
     color: red;
 }

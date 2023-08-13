@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using MobileApp.Models;
+using MobileApp.ViewModel;
 
 namespace MobileApp.Repositories
 {
@@ -12,31 +13,50 @@ namespace MobileApp.Repositories
             _context = context;
         }
 
-        public  void Create(Staff staff)
+        public  Staff? Create(Staff staff)
         {
-            string query = "EXEC dbo.RegisterStaff @username, @hash_password, @role";
-            try
+            string query = "EXEC [dbo].[RegisterStaff] @username, @hash_password, @role";
+			try
             {
-                    _context.Staffs.FromSqlRaw(query,
+                var x =  _context.Staffs.FromSqlRaw(query,
                         new SqlParameter("username", staff.Username),
                         new SqlParameter("hash_password", staff.HashPassword),
-                        new SqlParameter("role", staff.Role));
+                        new SqlParameter("role", staff.Role)).AsEnumerable().FirstOrDefault();
+
+               
+				return x;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                throw new Exception(ex.Message);
             }
         }
 
-        public Task<Staff> getById(int id)
+        public async Task<Staff?> getById(int id)
         {
-            throw new NotImplementedException();
-        }
+			return await _context.Staffs.FirstOrDefaultAsync(staff => staff.StaffId == id);
+		}
 
-        public Task<Staff> getByUserName(string userName)
+        public async Task<Staff?> getByUserName(string userName)
         {
-            throw new NotImplementedException();
-        }
-    }
+			return await _context.Staffs.FirstOrDefaultAsync(staff => staff.Username == userName);
+		}
+
+		public Staff? Login(StaffLoginViewModel StaffLoginviewModel)
+		{
+            string query = "EXEC dbo.[login] @username, @password";
+            try
+            {
+                Staff? staff = _context.Staffs.FromSqlRaw(query,
+                    new SqlParameter("username", StaffLoginviewModel.Username),
+                    new SqlParameter("password", StaffLoginviewModel.Password)).AsEnumerable().FirstOrDefault();
+                return staff;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+			
+		}
+	}
 }
